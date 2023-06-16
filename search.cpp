@@ -3,7 +3,20 @@
 
 uint32_t idastar_heuristic()
 {
-    return 1; //TEMPORARY!!!
+    //just do manhattan distance of each box to closest goal
+    uint32_t total = 0;
+    for (uint16_t i = 0; i < nboxes; i++)
+    {
+        uint8_t best_distance = LEVEL_WIDTH + LEVEL_HEIGHT;
+        for (uint16_t j = 0; j < nboxes; j++)
+        {
+            uint16_t offset = abs(goals[j] - boxes[i]); //orientation doesn't matter, so ABS!
+            uint8_t cur_distance = (offset / LEVEL_WIDTH) + (offset % LEVEL_WIDTH);
+            if(cur_distance < best_distance) best_distance = cur_distance;
+        }
+        total += best_distance;
+    }
+    return total;
 }
 
 std::set<uint64_t> tt;

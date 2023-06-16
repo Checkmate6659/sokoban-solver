@@ -103,7 +103,7 @@ int main()
     for (int i = 0; i < LEVEL_SIZE * 2; i++) zobrist_keys[i] = pseudo_rng();
     
     //Load levels
-    load_level(152); //a very hard level for this kind of program
+    load_level(109); //152 is a very hard level for this kind of program
     compute_dead_squares();
 
     print_level();

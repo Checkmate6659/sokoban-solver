@@ -4,10 +4,11 @@
 #include <inttypes.h>
 #include "level.h"
 #include <stdio.h>
-#include <set>
+#include <stdlib.h>
+#include <set> //TEMPORARY
 
 #define PATH_NOT_FOUND (((uint32_t)-1) >> 1)
-#define PATH_FOUND (PATH_NOT_FOUND - 1) //be careful when this is 0 (idk what happens then but sth weird)
+#define PATH_FOUND 123456789 //be careful when this is 0 (idk what happens then but sth weird)
 
 
 uint32_t idastar_heuristic();
