@@ -100,9 +100,10 @@ void print_level()
 
 int main()
 {
-    //initialize zobrist keys (randomly)
+    //initialize zobrist keys (randomly) and clear tt (in case of unluckily placed garbage)
     for (int i = 0; i < LEVEL_SIZE * 2; i++) zobrist_keys[i] = pseudo_rng();
-    
+    for (unsigned long i = 0; i < TT_SIZE; i++) tt[i].key = i - 1; //make all the keys invalid (unobtainable)
+
     //Load levels
     load_level(109); //152 is a very hard level for this kind of program
     compute_dead_squares();
