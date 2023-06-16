@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "level.h"
 #include "static_analysis.h"
 #include "search.h"
@@ -113,11 +114,13 @@ int main()
     for (int i = 0; i < nboxes; i++) printf("Goal %d at %d\n", i, goals[i]);
 
 
+    clock_t timer = -clock();
     uint32_t bound = idastar_heuristic();
     while (bound != PATH_FOUND && bound != PATH_NOT_FOUND)
     {
         bound = idastar_search(0, bound);
     }
-    printf("%u\n", bound);
+    timer += clock();
+    printf("RETURN %u IN TIME %lf\n", bound, timer/(double)CLOCKS_PER_SEC);
 }
 

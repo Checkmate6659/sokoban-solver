@@ -1,6 +1,8 @@
 #include "search.h"
 
 
+
+
 uint32_t idastar_heuristic()
 {
     //just do manhattan distance of each box to closest goal
