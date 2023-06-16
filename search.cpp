@@ -1,6 +1,7 @@
 #include "search.h"
 
 TTEntry tt[TT_SIZE];
+#define TT_STRATEGY_NAIVE //this strategy doesn't work on all levels, but its faster most of the time; also adding tt makes solver suboptimal
 
 
 uint32_t idastar_heuristic()
@@ -35,19 +36,7 @@ uint64_t nodes = 0;
 std::set<uint64_t> path_nodes;
 uint32_t idastar_search(uint32_t bound)
 {   
-    // uint64_t current_hash = zobrist_hash();
-    // uint64_t tt_index = current_hash % TT_SIZE;
-    // if (tt[tt_index].key == current_hash && tt[tt_index].cost < g) //if we found a TT entry that matches up with ours (aka if we're duping work)
-    // {
-    //     // printf("DUPE FOUND\n");
-    //     return tt[tt_index].cost; //then BAIL OUT!
-    // }
-
     nodes++;
-
-    // uint64_t hash = zobrist_hash();
-    // if (tt.find(hash) != tt.end()) return PATH_NOT_FOUND; //TEMP, use hashtable later
-    // tt.emplace(hash);
 
     //check if we won (O(n²) brute-force strategy)
     uint8_t boxesleft = nboxes;
@@ -76,12 +65,6 @@ uint32_t idastar_search(uint32_t bound)
             uint64_t successor_hash = zobrist_hash();//TEMP, use hashtable later
             uint32_t lookup_result = tt_lookup();
             if (new_esti > lookup_result) new_esti = lookup_result;
-
-            // uint64_t new_tt_index = successor_hash % TT_SIZE;
-            // if (tt[new_tt_index].key == successor_hash && tt[new_tt_index].cost < g + 1)
-            // {
-            //     return tt[new_tt_index].cost;
-            // }
 
             if (path_nodes.find(successor_hash) != path_nodes.end()) //can't get rid of this annoying piece of crap, because it adds more nodes
             {
@@ -113,8 +96,11 @@ uint32_t idastar_search(uint32_t bound)
     uint64_t current_hash = zobrist_hash();
     uint64_t tt_index = current_hash % TT_SIZE;
     tt[tt_index].key = current_hash;
+#ifdef TT_STRATEGY_NAIVE
     tt[tt_index].cost = new_bound; //naive alg: really fast, but suboptimal
-    // tt[tt_index].cost = (new_bound < new_esti) ? new_bound : new_esti; //take the minimum of both; more solid, but slower (many more nodes!) and still suboptimal
+#else
+    tt[tt_index].cost = (new_bound < new_esti) ? new_bound : new_esti; //take the minimum of both; more solid, but slower (many more nodes!) and still suboptimal
+#endif
 
     return new_bound;
 }

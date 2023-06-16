@@ -105,7 +105,9 @@ int main()
     for (unsigned long i = 0; i < TT_SIZE; i++) tt[i].key = i - 1; //make all the keys invalid (unobtainable)
 
     //Load levels
-    load_level(109); //69 is like 1 second with basic search, 109 is much easier; 152 is a very hard level for this kind of program
+    //69 is like 1 second with basic search, 109 is much easier; 152 is a very hard level for this kind of program
+    //105 in a bit less than 1s, 104 in like 4s
+    load_level(105);
     compute_dead_squares();
 
     print_level();
@@ -113,7 +115,6 @@ int main()
     printf("%d boxes in level\n", nboxes);
     for (int i = 0; i < nboxes; i++) printf("Box %d at %d\n", i, boxes[i]);
     for (int i = 0; i < nboxes; i++) printf("Goal %d at %d\n", i, goals[i]);
-
 
     clock_t timer = -clock();
     uint32_t bound = idastar_heuristic();
