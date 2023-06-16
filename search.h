@@ -19,6 +19,6 @@ typedef struct {
 extern TTEntry tt[TT_SIZE]; //transposition table
 
 uint32_t idastar_heuristic();
-uint32_t idastar_search(uint32_t g, uint32_t bound);
+uint32_t idastar_search(uint32_t bound);
 
 #endif

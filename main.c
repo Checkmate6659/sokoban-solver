@@ -105,7 +105,7 @@ int main()
     for (unsigned long i = 0; i < TT_SIZE; i++) tt[i].key = i - 1; //make all the keys invalid (unobtainable)
 
     //Load levels
-    load_level(109); //152 is a very hard level for this kind of program
+    load_level(109); //69 is like 1 second with basic search, 109 is much easier; 152 is a very hard level for this kind of program
     compute_dead_squares();
 
     print_level();
@@ -119,7 +119,7 @@ int main()
     uint32_t bound = idastar_heuristic();
     while (bound != PATH_FOUND && bound != PATH_NOT_FOUND)
     {
-        bound = idastar_search(0, bound);
+        bound = idastar_search(bound);
     }
     timer += clock();
     printf("RETURN %u IN TIME %lf\n", bound, timer/(double)CLOCKS_PER_SEC);
