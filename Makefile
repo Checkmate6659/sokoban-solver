@@ -1,9 +1,9 @@
 all:
 #DEBUG
-	# clang -Wall -Wextra *.c -g3
+	# clang++ -Wall -Wextra *.c *.cpp -g3
 
 #PROFILING
-	# clang -Wall -Wextra *.c -g3 -ggdb3 -pg
+	# clang++ -Wall -Wextra *.c *.cpp -g3 -ggdb3 -pg
 	# ./a.out
 	# gprof -b a.out gmon.out > profile.txt
 
