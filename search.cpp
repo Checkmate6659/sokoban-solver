@@ -21,6 +21,16 @@ uint32_t idastar_heuristic()
     return total;
 }
 
+uint32_t tt_lookup()
+{
+    uint64_t hash = zobrist_hash();
+    uint64_t tt_index = hash % TT_SIZE;
+    if (tt[tt_index].key == hash) return tt[tt_index].cost;
+    tt[tt_index].key = hash;
+    tt[tt_index].cost = idastar_heuristic();
+    return tt[tt_index].cost;
+}
+
 uint64_t nodes = 0;
 std::set<uint64_t> path_nodes;
 uint32_t idastar_search(uint32_t bound)
@@ -49,9 +59,6 @@ uint32_t idastar_search(uint32_t bound)
         printf("NODES %lu\n", nodes);
         return PATH_FOUND;
     }
-
-    uint32_t f = 1 + idastar_heuristic(); //for some reason when these 2 lines are at the front (as in wikipedia) it doesn't find solution
-    if (f > bound) return f;
     
     uint32_t min_cost = PATH_NOT_FOUND;
     //iterate through successors
@@ -66,6 +73,7 @@ uint32_t idastar_search(uint32_t bound)
             move(box, dir);
 
             uint64_t successor_hash = zobrist_hash();//TEMP, use hashtable later
+
             // uint64_t new_tt_index = successor_hash % TT_SIZE;
             // if (tt[new_tt_index].key == successor_hash && tt[new_tt_index].cost < g + 1)
             // {
@@ -79,7 +87,12 @@ uint32_t idastar_search(uint32_t bound)
             }
             path_nodes.emplace(successor_hash); //TMP
 
-            uint32_t result = 1 + idastar_search(bound - 1); //no macromoves so far, so cost of each move is 1
+            uint32_t lookup_result = tt_lookup();
+            uint32_t result = 1;
+            if (1 + lookup_result <= bound)
+                result += idastar_search(bound - 1); //no macromoves so far, so cost of each move is 1
+            else
+                result += lookup_result;
             unmove(box, dir); //boxes[i] gets modified, and so without this local var it wouldn't work!
 
             path_nodes.erase(successor_hash); //TMP
@@ -87,14 +100,17 @@ uint32_t idastar_search(uint32_t bound)
             //TODO: record moves of solution!
             if (result == PATH_FOUND + 1)
             {
-                // printf("%d %d\n", box, dir);
+                printf("%d %d\n", box, dir);
                 return PATH_FOUND; //make sure to do after undoing, otherwise its gonna screw up the level
             }
             if (result < min_cost) min_cost = result;
         }
     }
-    // tt[tt_index].key = current_hash;
-    // tt[tt_index].cost = min_cost;
+
+    uint64_t current_hash = zobrist_hash();
+    uint64_t tt_index = current_hash % TT_SIZE;
+    tt[tt_index].key = current_hash;
+    tt[tt_index].cost = min_cost;
 
     return min_cost;
 }
