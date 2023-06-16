@@ -60,7 +60,8 @@ uint32_t idastar_search(uint32_t bound)
         return PATH_FOUND;
     }
     
-    uint32_t min_cost = PATH_NOT_FOUND;
+    uint32_t new_esti = PATH_NOT_FOUND;
+    uint32_t new_bound = PATH_NOT_FOUND;
     //iterate through successors
     for (int i = 0; i < nboxes; i++)
     {
@@ -73,6 +74,8 @@ uint32_t idastar_search(uint32_t bound)
             move(box, dir);
 
             uint64_t successor_hash = zobrist_hash();//TEMP, use hashtable later
+            uint32_t lookup_result = tt_lookup();
+            if (new_esti > lookup_result) new_esti = lookup_result;
 
             // uint64_t new_tt_index = successor_hash % TT_SIZE;
             // if (tt[new_tt_index].key == successor_hash && tt[new_tt_index].cost < g + 1)
@@ -87,7 +90,6 @@ uint32_t idastar_search(uint32_t bound)
             }
             path_nodes.emplace(successor_hash); //TMP
 
-            uint32_t lookup_result = tt_lookup();
             uint32_t result = 1;
             if (1 + lookup_result <= bound)
                 result += idastar_search(bound - 1); //no macromoves so far, so cost of each move is 1
@@ -103,15 +105,17 @@ uint32_t idastar_search(uint32_t bound)
                 printf("%d %d\n", box, dir);
                 return PATH_FOUND; //make sure to do after undoing, otherwise its gonna screw up the level
             }
-            if (result < min_cost) min_cost = result;
+            if (result < new_bound) new_bound = result;
         }
     }
+    new_esti++;
 
     uint64_t current_hash = zobrist_hash();
     uint64_t tt_index = current_hash % TT_SIZE;
     tt[tt_index].key = current_hash;
-    tt[tt_index].cost = min_cost;
+    tt[tt_index].cost = new_bound; //naive alg: really fast, but suboptimal
+    // tt[tt_index].cost = (new_bound < new_esti) ? new_bound : new_esti; //take the minimum of both; more solid, but slower (many more nodes!) and still suboptimal
 
-    return min_cost;
+    return new_bound;
 }
 
