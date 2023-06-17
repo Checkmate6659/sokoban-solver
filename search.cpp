@@ -22,15 +22,6 @@ uint32_t idastar_heuristic()
     return total;
 }
 
-uint32_t tt_lookup(uint64_t hash)
-{
-    uint64_t tt_index = hash % TT_SIZE;
-    if (tt[tt_index].key == hash) return tt[tt_index].cost;
-    tt[tt_index].key = hash;
-    tt[tt_index].cost = idastar_heuristic();
-    return tt[tt_index].cost;
-}
-
 uint64_t nodes = 0;
 std::set<uint64_t> path_nodes;
 uint32_t idastar_search(uint32_t bound)
@@ -61,8 +52,16 @@ uint32_t idastar_search(uint32_t bound)
 
             move(box, dir);
 
+            //do TT lookup
             uint64_t successor_hash = boxes_hash ^ zobrist_keys[LEVEL_SIZE + normalized_player_pos];
-            uint32_t lookup_result = tt_lookup(successor_hash);
+            uint64_t tt_index = successor_hash % TT_SIZE;
+            if (tt[tt_index].key != successor_hash)
+            {
+                tt[tt_index].key = successor_hash; //always replace strategy
+                tt[tt_index].cost = idastar_heuristic(); //TT stores heuristics
+            }
+            uint32_t lookup_result = tt[tt_index].cost;
+
             if (new_esti > lookup_result) new_esti = lookup_result;
 
             if (path_nodes.find(successor_hash) != path_nodes.end()) //can't get rid of this annoying piece of crap, because it adds more nodes
