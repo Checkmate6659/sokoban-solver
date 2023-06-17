@@ -108,17 +108,14 @@ int main()
     //Load levels
     //69 is like 1 second with basic search, 109 is much easier; 152 is a very hard level for this kind of program
     //105 in a bit less than 1s, 104 in like 4s
-    //and 110 is a bit harder
-    load_level(104);
+    //and 110 is a bit harder; 142 is even a bit harder
+    load_level(142);
     compute_dead_squares();
 
     print_level();
     printf("%d boxes in level\n", nboxes);
     for (int i = 0; i < nboxes; i++) printf("Box %d at %d\n", i, boxes[i]);
     for (int i = 0; i < nboxes; i++) printf("Goal %d at %d\n", i, goals[i]);
-
-    // printf("LOWERBOUND %d\n", compute_initial_lower_bound());
-    // return 0;
 
     // uint32_t bound = idastar_heuristic();
     uint32_t bound = compute_initial_lower_bound(); //an initial lower bound more precise than what's used in the search

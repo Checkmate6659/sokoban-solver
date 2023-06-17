@@ -3,6 +3,8 @@
 uint8_t sa_temp[LEVEL_SIZE];
 #define CLEAR_TEMP memset(sa_temp, 0, sizeof(sa_temp))
 
+
+
 int dss_pushable_dfs(int node)
 {
     if (level[node] == AIR || (level[node] & GOAL)) return 1; //Goal square reachable! Also, when computing dead squares, a square labeled as AIR is actually never dead
@@ -79,28 +81,26 @@ int ilb_pushable_bfs(int start, int end)
 //after that it will be the minimum weight perfect matching (using Hungarian algorithm because large box sizes)
 uint32_t compute_initial_lower_bound()
 {
-    uint32_t distances[MAX_BOXES][MAX_BOXES]; //allocate it (and it will be freed automatically when compiling)
+    uint8_t distances[nboxes][nboxes]; //allocate it (and it will be freed automatically when compiling)
+    std::vector<std::vector<int>> matrix; //for Hungarian algorithm (this matrix is gonna get messed up, so we need an original copy)
 
     //iterate through all box/goal pairs and compute the distances
     for (uint16_t i = 0; i < nboxes; i++)
     {
+        matrix.push_back(std::vector<int>{});
         for (uint16_t j = 0; j < nboxes; j++)
         {
             CLEAR_TEMP; //clear temporary array (and then use it for labeling discovered nodes)
-            distances[i][j] = ilb_pushable_bfs(boxes[i], goals[j]); //somehow this is fucked! > manhattan dist?
-
-            // printf("%d From %d To %d\n", distances[i][j], boxes[i], goals[j]);
-
-            // uint16_t offset = abs(goals[j] - boxes[i]); //orientation doesn't matter, so ABS!
-            // printf("OFFSET %d YDIFF %d XDIFF %d\n", offset, (offset + LEVEL_WIDTH / 2) / LEVEL_WIDTH, (offset + LEVEL_WIDTH/2) % LEVEL_WIDTH - LEVEL_WIDTH / 2);
-            // distances[i][j] = ((offset + LEVEL_WIDTH / 2) / LEVEL_WIDTH) + ((offset + LEVEL_WIDTH/2) % LEVEL_WIDTH - LEVEL_WIDTH / 2);
+            distances[i][j] = ilb_pushable_bfs(boxes[i], goals[j]);
+            // matrix[i][j] = distances[i][j];
+            matrix.at(matrix.size() - 1).push_back(distances[i][j]);
 
             // printf("%d From %d To %d\n", distances[i][j], boxes[i], goals[j]);
         }
     }
 
     //do shortest path distance of each box to closest goal (TODO: MWPM)
-    uint32_t total = 0;
+    /* uint32_t total = 0;
     for (uint16_t i = 0; i < nboxes; i++)
     {
         uint8_t best_distance = LEVEL_WIDTH + LEVEL_HEIGHT;
@@ -111,5 +111,12 @@ uint32_t compute_initial_lower_bound()
         }
         total += best_distance;
     }
-    return total;
+    return total; */
+
+
+    //compute the maximum weight bipartite matching using the Hungarian/Munkres Assignment algorithm
+    //time complexity O(n³)
+
+    // printf("RESULT %d\n", do_hungarian(matrix));
+    return do_hungarian(matrix);
 }

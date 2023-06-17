@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <queue>
+#include <vector>
 #include "level.h"
+#include "util.h"
 
 //same as CAN_PUSH, but boxes not taken into account
 #define CAN_PUSH_STATIC(tile, dir) (level[(tile) + (dir)] != WALL && level[(tile) - (dir)] != WALL)

@@ -7,7 +7,7 @@ TTEntry tt[TT_SIZE]; //large transposition table
 
 uint32_t idastar_heuristic()
 {
-    //just do manhattan distance of each box to closest goal
+    //just do manhattan distance of each box to closest goal (GROSS underestimation, TODO: experiment with more advanced strategies)
     uint32_t total = 0;
     for (uint16_t i = 0; i < nboxes; i++)
     {
