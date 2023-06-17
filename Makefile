@@ -7,5 +7,11 @@ all:
 	# ./a.out
 	# gprof -b a.out gmon.out > profile.txt
 
+#LINE PROFILING
+	# gcc -fprofile-arcs -ftest-coverage *.c
+	# ./a.out
+	# gcov *.c
+	# rm *.gcda *.gcno
+
 #RELEASE
 	clang -Wall -Wextra *.c -O3 -Ofast -flto -march=native -s -DNDEBUG -fno-signed-zeros -funroll-loops -fomit-frame-pointer -fno-stack-protector

@@ -108,7 +108,7 @@ int main()
     //Load levels
     //69 is like 1 second with basic search, 109 is much easier; 152 is a very hard level for this kind of program
     //105 in a bit less than 1s, 104 in like 4s
-    load_level(105);
+    load_level(104);
     compute_dead_squares();
 
     print_level();

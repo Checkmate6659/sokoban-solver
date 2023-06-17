@@ -15,22 +15,7 @@ uint16_t boxes[MAX_BOXES], goals[MAX_BOXES];
 uint16_t fill_stack_index = 0;
 uint16_t fill_stack[(LEVEL_WIDTH - 2) * (LEVEL_HEIGHT - 2)]; //flood fill stack (its probably way too large)
 
-void flood_fill_scan(uint16_t pos, uint16_t rpos) //check for free space from lx (incl) to rx (not incl)
-{
-    for (uint8_t no_span_added = 1; pos < rpos; pos++)
-    {
-        if (reachable_area[pos] || level[pos] & BOX) //if obstacle
-        {
-            no_span_added = 1;
-        }
-        else if (no_span_added)
-        {
-            fill_stack[fill_stack_index++] = pos;
-            no_span_added = 0;
-        }
-    }
-}
-
+//This is the absolute most voracious algorithm of the entire program
 void compute_reachable_area(uint16_t player_pos)
 {
     memset(reachable_area, 0, sizeof(reachable_area)); //at first start at all zeros
@@ -63,7 +48,7 @@ void compute_reachable_area(uint16_t player_pos)
         for (uint16_t i = lpos; i < rpos; i++)
         {
             //check scanline down
-            if (reachable_area[i + LEVEL_WIDTH] || level[i + LEVEL_WIDTH] & BOX) //if obstacle down
+            if (reachable_area[i + LEVEL_WIDTH] || (level[i + LEVEL_WIDTH] & BOX)) //if obstacle down
                 no_span_added_down = 1;
             else if (no_span_added_down)
             {
@@ -71,7 +56,7 @@ void compute_reachable_area(uint16_t player_pos)
                 no_span_added_down = 0;
             }
             //check scanline up
-            if (reachable_area[i - LEVEL_WIDTH] || level[i - LEVEL_WIDTH] & BOX) //if obstacle up
+            if (reachable_area[i - LEVEL_WIDTH] || (level[i - LEVEL_WIDTH] & BOX)) //if obstacle up
                 no_span_added_up = 1;
             else if (no_span_added_up)
             {
@@ -113,6 +98,6 @@ void unmove(uint16_t box, int16_t dir)
 
     boxes_hash ^= zobrist_keys[box] ^ zobrist_keys[box + dir]; //update hash
 
-    compute_reachable_area(box - dir); //recompute player-reachable area (wondering if there is a more efficient way to do this, but this floodfill is pretty good)
+    compute_reachable_area(box - dir); //recompute player-reachable area (TODO: try optimizing?)
 }
 
