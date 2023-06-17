@@ -35,6 +35,7 @@ extern uint16_t nboxes; //the number of boxes in the level
 extern uint64_t boxes_hash;
 extern uint8_t reachable_area[LEVEL_SIZE]; //the area the player can reach
 extern uint16_t normalized_player_pos;
+extern uint32_t depth;
 extern uint64_t zobrist_keys[LEVEL_SIZE * 2];
 
 void compute_reachable_area(uint16_t player_pos); //Compute the area reachable by the player (not including boxes)
