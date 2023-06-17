@@ -15,19 +15,18 @@ uint16_t boxes[MAX_BOXES], goals[MAX_BOXES];
 uint16_t fill_stack_index = 0;
 uint16_t fill_stack[(LEVEL_WIDTH - 2) * (LEVEL_HEIGHT - 2)]; //flood fill stack (its probably way too large)
 
-void flood_fill_scan(uint8_t lx, uint8_t rx, uint8_t y) //check for free space from lx (incl) to rx (not incl)
+void flood_fill_scan(uint16_t pos, uint16_t rpos) //check for free space from lx (incl) to rx (not incl)
 {
-    uint8_t span_added = 0;
-    for (uint8_t x = lx; x < rx; x++)
+    for (uint8_t no_span_added = 1; pos < rpos; pos++)
     {
-        if (reachable_area[COORDINATES(rx, y)] || level[COORDINATES(x, y)] & BOX) //if obstacle
+        if (reachable_area[pos] || level[pos] & BOX) //if obstacle
         {
-            span_added = 0;
+            no_span_added = 1;
         }
-        else if (!span_added)
+        else if (no_span_added)
         {
-            fill_stack[fill_stack_index++] = COORDINATES(x, y);
-            span_added = 1;
+            fill_stack[fill_stack_index++] = pos;
+            no_span_added = 0;
         }
     }
 }
@@ -45,24 +44,23 @@ void compute_reachable_area(uint16_t player_pos)
         //update normalized player position (its needed here too)
         if (normalized_player_pos > pos) normalized_player_pos = pos;
 
-        uint8_t y = Y_POSITION(pos); //thiese x and y position calculations should only be temporary
-        uint8_t lx = X_POSITION(pos);
-        uint8_t rx = lx;
-        while (!reachable_area[COORDINATES(lx - 1, y)] && !(level[COORDINATES(lx - 1, y)] & BOX)) //while there is no obstacle, keep going left
+        uint16_t lpos = pos;
+        uint16_t rpos = pos;
+        while (!reachable_area[lpos - 1] && !(level[lpos - 1] & BOX)) //while there is no obstacle, keep going left
         {
-            --lx;
-            reachable_area[COORDINATES(lx, y)] = 1;
+            --lpos;
+            reachable_area[lpos] = 1;
             //update normalized player position (only needed on the LEFT! and the middle)
-            if (normalized_player_pos > COORDINATES(lx, y)) normalized_player_pos = COORDINATES(lx, y);
+            if (normalized_player_pos > lpos) normalized_player_pos = lpos;
         }
-        while (!reachable_area[COORDINATES(rx, y)] && !(level[COORDINATES(rx, y)] & BOX)) //while there is no obstacle, keep going right
+        while (!reachable_area[rpos] && !(level[rpos] & BOX)) //while there is no obstacle, keep going right
         {
-            reachable_area[COORDINATES(rx, y)] = 1;
-            ++rx;
+            reachable_area[rpos] = 1;
+            ++rpos;
         }
 
-        flood_fill_scan(lx, rx, y + 1); //rx not included!
-        flood_fill_scan(lx, rx, y - 1);
+        flood_fill_scan(lpos + LEVEL_WIDTH, rpos + LEVEL_WIDTH); //rpos not included!
+        flood_fill_scan(lpos - LEVEL_WIDTH, rpos - LEVEL_WIDTH);
     }
 }
 
