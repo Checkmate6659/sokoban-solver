@@ -15,7 +15,8 @@ uint32_t idastar_heuristic()
         for (uint16_t j = 0; j < nboxes; j++)
         {
             uint16_t offset = abs(goals[j] - boxes[i]); //orientation doesn't matter, so ABS!
-            uint8_t cur_distance = (offset / LEVEL_WIDTH) + (offset % LEVEL_WIDTH);
+            //this next line is a complicated mess, but it's necessary (altho mb there is a better way to do it?)
+            uint8_t cur_distance = ((offset + LEVEL_WIDTH / 2) / LEVEL_WIDTH) + ((offset + LEVEL_WIDTH/2) % LEVEL_WIDTH - LEVEL_WIDTH / 2);
             if(cur_distance < best_distance) best_distance = cur_distance;
         }
         total += best_distance;
@@ -42,12 +43,12 @@ uint32_t idastar_search(uint32_t bound)
     uint32_t new_esti = PATH_NOT_FOUND;
     uint32_t new_bound = PATH_NOT_FOUND;
     //iterate through successors
-    for (int i = 0; i < nboxes; i++)
+    for (uint16_t i = 0; i < nboxes; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (uint8_t j = 0; j < 4; j++)
         {
-            int dir = DIRECTIONS[j];
-            int box = boxes[i];
+            int8_t dir = DIRECTIONS[j];
+            uint16_t box = boxes[i];
             if (!reachable_area[box - dir] || !CAN_PUSH(box, dir)) continue; //can't push the box! so skip move
 
             move(box, dir);
