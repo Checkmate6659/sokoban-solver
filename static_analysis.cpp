@@ -77,8 +77,8 @@ int ilb_pushable_bfs(int start, int end)
 }
 
 //Initial lower bound
-//For now it's the sum of lengths of shortest paths from each box to each goal (computed with lazy as hell bfs, and NOT dfs because that overestimates!)
-//after that it will be the minimum weight perfect matching (using Hungarian algorithm because large box sizes)
+//Its the minimum weight perfect matching of boxes to goals (by distance accounting for walls too)
+//Implemented in a horribly inefficient way, but it's only preprocessing anyway so it's fine
 uint32_t compute_initial_lower_bound()
 {
     uint8_t distances[nboxes][nboxes]; //allocate it (and it will be freed automatically when compiling)
