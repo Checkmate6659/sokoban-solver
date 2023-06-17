@@ -31,17 +31,18 @@ void compute_reachable_area(uint16_t player_pos)
     reachable_area_flood_fill(player_pos);
 }
 
+uint64_t boxes_hash = 0;
 uint64_t zobrist_hash() //easiest and slowest method of zobrist hashing imaginable: just hash the entire board
 {
     uint64_t hash = zobrist_keys[LEVEL_SIZE + normalized_player_pos]; //normalized player position
-    uint16_t i = LEVEL_WIDTH + 1;
-    for (uint16_t remaining_boxes = nboxes; remaining_boxes; i++) //we can prune the top and bottom edges
-    {
-        if ((level[i] & 3) != BOX) continue; //not a box = not interesting
-        hash ^= zobrist_keys[i];
-        --remaining_boxes; //decrement the amount of remaining boxes
-    }
-    return hash;    
+    // uint16_t i = LEVEL_WIDTH + 1;
+    // for (uint16_t remaining_boxes = nboxes; remaining_boxes; i++) //we can prune the top and bottom edges
+    // {
+    //     if ((level[i] & 3) != BOX) continue; //not a box = not interesting
+    //     hash ^= zobrist_keys[i];
+    //     --remaining_boxes; //decrement the amount of remaining boxes
+    // }
+    return hash ^ boxes_hash;
 }
 
 void move(uint16_t box, int16_t dir)
@@ -55,6 +56,9 @@ void move(uint16_t box, int16_t dir)
         }
     level[box] &= ~BOX; //be careful with goal squares
     level[box + dir] |= BOX;
+    
+    boxes_hash ^= zobrist_keys[box] ^ zobrist_keys[box + dir]; //update hash
+
     compute_reachable_area(box); //recompute player-reachable area
 }
 
@@ -69,6 +73,9 @@ void unmove(uint16_t box, int16_t dir)
         }
     level[box + dir] &= ~BOX; //be careful with goal squares
     level[box] |= BOX;
+
+    boxes_hash ^= zobrist_keys[box] ^ zobrist_keys[box + dir]; //update hash
+
     compute_reachable_area(box - dir); //recompute player-reachable area (wondering if there is a more efficient way to do this, but this floodfill is pretty good)
 }
 
