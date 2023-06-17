@@ -22,9 +22,8 @@ uint32_t idastar_heuristic()
     return total;
 }
 
-uint32_t tt_lookup()
+uint32_t tt_lookup(uint64_t hash)
 {
-    uint64_t hash = zobrist_hash();
     uint64_t tt_index = hash % TT_SIZE;
     if (tt[tt_index].key == hash) return tt[tt_index].cost;
     tt[tt_index].key = hash;
@@ -35,7 +34,7 @@ uint32_t tt_lookup()
 uint64_t nodes = 0;
 std::set<uint64_t> path_nodes;
 uint32_t idastar_search(uint32_t bound)
-{   
+{
     nodes++;
 
     //check if we won (O(n²) brute-force strategy)
@@ -62,8 +61,8 @@ uint32_t idastar_search(uint32_t bound)
 
             move(box, dir);
 
-            uint64_t successor_hash = zobrist_hash();//TEMP, use hashtable later
-            uint32_t lookup_result = tt_lookup();
+            uint64_t successor_hash = boxes_hash ^ zobrist_keys[LEVEL_SIZE + normalized_player_pos];
+            uint32_t lookup_result = tt_lookup(successor_hash);
             if (new_esti > lookup_result) new_esti = lookup_result;
 
             if (path_nodes.find(successor_hash) != path_nodes.end()) //can't get rid of this annoying piece of crap, because it adds more nodes
@@ -85,7 +84,7 @@ uint32_t idastar_search(uint32_t bound)
             //TODO: record moves of solution!
             if (result == PATH_FOUND + 1)
             {
-                printf("%d %d\n", box, dir);
+                // printf("%d %d\n", box, dir); //printing the solution backwards
                 return PATH_FOUND; //make sure to do after undoing, otherwise its gonna screw up the level
             }
             if (result < new_bound) new_bound = result;
@@ -93,7 +92,7 @@ uint32_t idastar_search(uint32_t bound)
     }
     new_esti++;
 
-    uint64_t current_hash = zobrist_hash();
+    uint64_t current_hash = boxes_hash ^ zobrist_keys[LEVEL_SIZE + normalized_player_pos];
     uint64_t tt_index = current_hash % TT_SIZE;
     tt[tt_index].key = current_hash;
 #ifdef TT_STRATEGY_NAIVE

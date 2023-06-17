@@ -111,7 +111,6 @@ int main()
     compute_dead_squares();
 
     print_level();
-    printf("%lu\n", zobrist_hash());
     printf("%d boxes in level\n", nboxes);
     for (int i = 0; i < nboxes; i++) printf("Box %d at %d\n", i, boxes[i]);
     for (int i = 0; i < nboxes; i++) printf("Goal %d at %d\n", i, goals[i]);

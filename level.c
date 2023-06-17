@@ -6,6 +6,7 @@ const int16_t DIRECTIONS[4] = {1, LEVEL_WIDTH, -LEVEL_WIDTH, -1};
 //the current level
 Tile level[LEVEL_SIZE] = {};
 uint16_t nboxes = 0;
+uint64_t boxes_hash = 0;
 uint8_t reachable_area[LEVEL_SIZE];
 uint16_t normalized_player_pos;
 uint64_t zobrist_keys[LEVEL_SIZE * 2]; //we need some zobrist keys (we have a bit more than required here)
@@ -29,20 +30,6 @@ void compute_reachable_area(uint16_t player_pos)
     memset(reachable_area, 0, sizeof(reachable_area)); //at first start at all zeros
     normalized_player_pos = player_pos;
     reachable_area_flood_fill(player_pos);
-}
-
-uint64_t boxes_hash = 0;
-uint64_t zobrist_hash() //easiest and slowest method of zobrist hashing imaginable: just hash the entire board
-{
-    uint64_t hash = zobrist_keys[LEVEL_SIZE + normalized_player_pos]; //normalized player position
-    // uint16_t i = LEVEL_WIDTH + 1;
-    // for (uint16_t remaining_boxes = nboxes; remaining_boxes; i++) //we can prune the top and bottom edges
-    // {
-    //     if ((level[i] & 3) != BOX) continue; //not a box = not interesting
-    //     hash ^= zobrist_keys[i];
-    //     --remaining_boxes; //decrement the amount of remaining boxes
-    // }
-    return hash ^ boxes_hash;
 }
 
 void move(uint16_t box, int16_t dir)
