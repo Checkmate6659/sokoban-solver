@@ -59,8 +59,26 @@ void compute_reachable_area(uint16_t player_pos)
             ++rpos;
         }
 
-        flood_fill_scan(lpos + LEVEL_WIDTH, rpos + LEVEL_WIDTH); //rpos not included!
-        flood_fill_scan(lpos - LEVEL_WIDTH, rpos - LEVEL_WIDTH);
+        uint8_t no_span_added_down = 1, no_span_added_up = 1;
+        for (uint16_t i = lpos; i < rpos; i++)
+        {
+            //check scanline down
+            if (reachable_area[i + LEVEL_WIDTH] || level[i + LEVEL_WIDTH] & BOX) //if obstacle down
+                no_span_added_down = 1;
+            else if (no_span_added_down)
+            {
+                fill_stack[fill_stack_index++] = i + LEVEL_WIDTH;
+                no_span_added_down = 0;
+            }
+            //check scanline up
+            if (reachable_area[i - LEVEL_WIDTH] || level[i - LEVEL_WIDTH] & BOX) //if obstacle up
+                no_span_added_up = 1;
+            else if (no_span_added_up)
+            {
+                fill_stack[fill_stack_index++] = i - LEVEL_WIDTH;
+                no_span_added_up = 0;
+            }
+        }
     }
 }
 
