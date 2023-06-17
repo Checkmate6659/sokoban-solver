@@ -1,6 +1,7 @@
 #include "search.h"
 
-TTEntry tt[TT_SIZE];
+uint64_t path_nodes[PATH_SIZE]; //simple hash table for current path
+TTEntry tt[TT_SIZE]; //large transposition table
 #define TT_STRATEGY_NAIVE //this strategy doesn't work on all levels, but its faster most of the time; also adding tt makes solver suboptimal
 
 
@@ -23,7 +24,6 @@ uint32_t idastar_heuristic()
 }
 
 uint64_t nodes = 0;
-std::set<uint64_t> path_nodes;
 uint32_t idastar_search(uint32_t bound)
 {
     nodes++;
@@ -64,12 +64,13 @@ uint32_t idastar_search(uint32_t bound)
 
             if (new_esti > lookup_result) new_esti = lookup_result;
 
-            if (path_nodes.find(successor_hash) != path_nodes.end()) //can't get rid of this annoying piece of crap, because it adds more nodes
+            uint32_t pathnode_index = successor_hash % PATH_SIZE;
+            if (path_nodes[pathnode_index] == successor_hash)
             {
                 unmove(box, dir);
                 continue;
             }
-            path_nodes.emplace(successor_hash); //TMP
+            path_nodes[pathnode_index] = successor_hash; //put current node in the path table
 
             uint32_t result = 1;
             if (1 + lookup_result <= bound)
@@ -78,7 +79,7 @@ uint32_t idastar_search(uint32_t bound)
                 result += lookup_result;
             unmove(box, dir); //boxes[i] gets modified, and so without this local var it wouldn't work!
 
-            path_nodes.erase(successor_hash); //TMP
+            path_nodes[pathnode_index] -= 1; //and remove it after the search
 
             //TODO: record moves of solution!
             if (result == PATH_FOUND + 1)

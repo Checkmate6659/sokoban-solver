@@ -102,6 +102,7 @@ int main()
 {
     //initialize zobrist keys (randomly) and clear tt (in case of unluckily placed garbage)
     for (int i = 0; i < LEVEL_SIZE * 2; i++) zobrist_keys[i] = pseudo_rng();
+    for (unsigned long i = 0; i < PATH_SIZE; i++) path_nodes[i] = i - 1; //make all the path keys invalid (unobtainable)
     for (unsigned long i = 0; i < TT_SIZE; i++) tt[i].key = i - 1; //make all the keys invalid (unobtainable)
 
     //Load levels
