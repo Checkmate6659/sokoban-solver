@@ -2,6 +2,7 @@
 #define LEVEL_H
 
 #include <inttypes.h>
+#include <stdio.h>
 #include "util.h"
 
 //maximum level dimensions (i added a bit of extra clearance in case I want to do like sasquatch levels)
@@ -10,6 +11,8 @@
 #define MAX_BOXES ((LEVEL_WIDTH - 2) * (LEVEL_HEIGHT - 2) >> 1) //a reasonable number of boxes for a sokoban level
 #define LEVEL_SIZE (LEVEL_WIDTH * LEVEL_HEIGHT)
 #define COORDINATES(x, y) ((x) + (y) * LEVEL_WIDTH)
+#define X_POSITION(i) ((i) % LEVEL_WIDTH)
+#define Y_POSITION(i) ((i) / LEVEL_WIDTH)
 
 //target square cannot be box, dead, wall; behind source cannot be box, wall
 #define CAN_PUSH(tile, dir) (!(level[(tile) + (dir)] & WALL) && !(level[(tile) - (dir)] & BOX))
