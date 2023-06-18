@@ -32,8 +32,7 @@ uint32_t idastar_search(uint32_t bound)
     //check if we won (O(n²) brute-force strategy)
     uint8_t boxesleft = nboxes;
     for (uint16_t i = 0; i < nboxes; i++)
-        for (uint16_t j = 0; j < nboxes; j++)
-            if (boxes[i] == goals[j]) boxesleft--;
+        if (level[boxes[i]] & GOAL) boxesleft--;
     if (!boxesleft)
     {
         printf("NODES %lu\n", nodes);
